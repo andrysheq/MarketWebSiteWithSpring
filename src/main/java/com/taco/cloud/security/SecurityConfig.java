@@ -3,30 +3,28 @@ package com.taco.cloud.security;
 import com.taco.cloud.data.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled=true)
-public class SecurityConfig {
+public class SecurityConfig extends WebSecurityConfigurerAdapter{
+    private final CloudUserService cloudUserService;
+
+    public SecurityConfig(CloudUserService cloudUserService) {
+        this.cloudUserService = cloudUserService;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -44,36 +42,61 @@ public class SecurityConfig {
 //        return new InMemoryUserDetailsManager(usersList);
 //    }
 
-    @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepo) {
-        return username -> {
-            com.taco.cloud.models.User user = userRepo.findByUsername(username);
-            if (user != null) return user;
-            throw new UsernameNotFoundException("User ‘" + username + "’ not found");
-        };
+//    @Bean
+//    public UserDetailsService userDetailsService(UserRepository userRepo) {
+//        return username -> {
+//            com.taco.cloud.models.User user = userRepo.findByUsername(username);
+//            if (user != null) return user;
+//            throw new UsernameNotFoundException("User ‘" + username + "’ not found");
+//        };
+//    }
+
+    @Override
+    protected void configure (AuthenticationManagerBuilder auth) throws Exception{
+        auth.userDetailsService(cloudUserService).passwordEncoder(passwordEncoder());
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-         http
+    @Override
+    protected void configure (HttpSecurity http) throws Exception{
+        http
                 .authorizeRequests()
-                .requestMatchers(antMatcher("/design"), antMatcher("/orders")).hasRole("USER")
-                 .requestMatchers(toH2Console()).permitAll()
+                .mvcMatchers("/design", "/orders").hasRole("USER")
+                .requestMatchers(toH2Console()).permitAll()
                 .anyRequest().permitAll()
-                 .and()
+                .and()
                 .formLogin(form -> form.loginPage("/login")
-                        .loginProcessingUrl("/authenticate")
-                        .usernameParameter("user")
+                        .usernameParameter("username")
                         .passwordParameter("password")
                         .defaultSuccessUrl("/design"))
                 .logout(logout -> logout.logoutSuccessUrl("/login"))
-                 .csrf(csrf -> csrf
-                         .ignoringRequestMatchers(toH2Console())
-                         .disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(toH2Console())
+                        .disable())
 //                 .authorizeHttpRequests(auth -> auth
 //                         .requestMatchers(toH2Console()).permitAll())
-                 .headers(headers -> headers.frameOptions(FrameOptionsConfig::disable));
-
-         return http.build();
+                .headers(headers -> headers.frameOptions(FrameOptionsConfig::disable));
     }
+//
+//    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//         http
+//                .authorizeRequests()
+//                .mvcMatchers("/design", "/orders").hasRole("USER")
+//                 .requestMatchers(toH2Console()).permitAll()
+//                .anyRequest().permitAll()
+//                 .and()
+//                .formLogin(form -> form.loginPage("/login")
+//                        .usernameParameter("username")
+//                        .passwordParameter("password")
+//                        .defaultSuccessUrl("/design"))
+//                .logout(logout -> logout.logoutSuccessUrl("/login"))
+//                 .csrf(csrf -> csrf
+//                         .ignoringRequestMatchers(toH2Console())
+//                         .disable())
+////                 .authorizeHttpRequests(auth -> auth
+////                         .requestMatchers(toH2Console()).permitAll())
+//                 .headers(headers -> headers.frameOptions(FrameOptionsConfig::disable));
+//
+//         return http.build();
+//    }
 }

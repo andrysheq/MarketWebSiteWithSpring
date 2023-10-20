@@ -3,7 +3,7 @@ package com.taco.cloud.models;
 import java.util.Arrays;
 import java.util.Collection;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +31,7 @@ public class User implements UserDetails {
     private Long id;
     private final String username;
     private final String password;
-    private final String fullname;
+    private final String fullName;
     private final String street;
     private final String city;
     private final String state;

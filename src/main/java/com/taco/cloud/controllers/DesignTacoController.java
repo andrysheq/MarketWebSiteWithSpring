@@ -8,7 +8,7 @@ import com.taco.cloud.models.Ingredient;
 import com.taco.cloud.models.Ingredient.Type;
 import com.taco.cloud.models.Taco;
 import com.taco.cloud.models.TacoOrder;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

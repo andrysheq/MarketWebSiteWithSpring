@@ -24,6 +24,10 @@ spring.h2.console.enabled: true
 spring.h2.console.path: /h2-console
 
 spring:
+  data:
+    rest:
+      base-path:
+        /data-api
   jpa:
     show-sql:
       true

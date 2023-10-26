@@ -6,6 +6,8 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -70,5 +72,13 @@ public class OrderController {
             order.setCVV(patch.getCVV());
         }
         return orderRepo.save(order);
+    }
+
+    @DeleteMapping("/{orderId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteOrder(@PathVariable("orderId") Long orderId) {
+        try {
+            orderRepo.deleteById(orderId);
+        } catch (EmptyResultDataAccessException e) {}
     }
 }

@@ -2,6 +2,7 @@ package com.taco.cloud;
 
 import com.taco.cloud.data.IngredientRepository;
 import com.taco.cloud.data.TacoRepository;
+import com.taco.cloud.data.UserRepository;
 import com.taco.cloud.models.Ingredient;
 import com.taco.cloud.models.Ingredient.Type;
 import com.taco.cloud.models.Taco;
@@ -10,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -22,7 +24,7 @@ public class CloudApplication {
 	}
 
 	@Bean
-	public CommandLineRunner dataLoader(IngredientRepository repo, TacoRepository tacoRepo) {
+	public CommandLineRunner dataLoader(IngredientRepository ingredientRepo, TacoRepository tacoRepo) {
 		return args -> {
 			Ingredient flourTortilla = new Ingredient(
 					"FLTO", "Flour Tortilla", Type.WRAP);
@@ -44,16 +46,16 @@ public class CloudApplication {
 					"SLSA", "Salsa", Type.SAUCE);
 			Ingredient sourCream = new Ingredient(
 					"SRCR", "Sour Cream", Type.SAUCE);
-			repo.save(flourTortilla);
-			repo.save(cornTortilla);
-			repo.save(groundBeef);
-			repo.save(carnitas);
-			repo.save(tomatoes);
-			repo.save(lettuce);
-			repo.save(cheddar);
-			repo.save(jack);
-			repo.save(salsa);
-			repo.save(sourCream);
+			ingredientRepo.save(flourTortilla);
+			ingredientRepo.save(cornTortilla);
+			ingredientRepo.save(groundBeef);
+			ingredientRepo.save(carnitas);
+			ingredientRepo.save(tomatoes);
+			ingredientRepo.save(lettuce);
+			ingredientRepo.save(cheddar);
+			ingredientRepo.save(jack);
+			ingredientRepo.save(salsa);
+			ingredientRepo.save(sourCream);
 
 			Taco taco1 = new Taco();
 			taco1.setName("Carnivore");
